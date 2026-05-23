@@ -1,66 +1,106 @@
 <!doctype html>
 <html>
-	<head>
-		<meta charset="utf-8" />
-		<meta
-			name="viewport"
-			content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
-		/>
-		<title>Scramjet</title>
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+	<title>Scramjet</title>
 
-		<link rel="shortcut icon" content="favicon.webp" />
-	
-		<script src="/scram/scramjet.all.js"></script>
-		<script src="/baremux/index.js"></script>
-		
-		<link rel="stylesheet" href="index.css" />
-		<script src="register-sw.js" defer></script>
-		<script src="search.js" defer></script>
-		<script src="index.js" defer></script>
-	</head>
+	<link rel="shortcut icon" href="favicon.ico" />
+	<script src="https://unpkg.com/lucide@latest"></script>
 
-	<body>
-		<div title="Scramjet Logo" class="flex-center logo-wrapper header-center">
-			<img class="logo" src="sj.png" alt="Scramjet" />
-			<h1>Scramjet | MW</h1>
-		</div>
-		<div class="flex-center desc left-margin">
-			<p>
-				Scramjet is an experimental interception based web proxy designed to
-				evade internet censorship, bypass arbitrary web browser restrictions and
-				innovate web proxy technologies.
-			</p>
-		</div>
+	<script src="/scramjet/scramjet.js"></script>
+	<script src="/controller/controller.api.js"></script>
+	<script src="/libcurl/index.js"></script>
 
-		<form id="sj-form" class="flex-center">
-			<input
-				id="sj-search-engine"
-				value="https://www.google.com/search?q=%s"
-				type="hidden"
-			/>
-			<input id="sj-address" type="text" placeholder="Search the web freely" />
-		</form>
-		<div class="desc left-margin">
+	<link rel="stylesheet" href="index.css" />
+
+	<script src="register-sw.js" defer></script>
+	<script src="adguard-client.js" defer></script>
+	<script src="search.js" defer></script>
+	<script src="index.js" defer></script>
+</head>
+
+<body>
+	<div class="app-shell is-ui-collapsed">
+
+		<button id="sj-toggle-ui" class="ui-toggle" type="button" aria-label="Toggle toolbar" title="Toggle toolbar">
+			<i data-lucide="chevron-up"></i>
+		</button>
+
+		<header class="topbar overlay">
+			<form id="sj-form" class="toolbar" autocomplete="off">
+				<div class="nav-actions">
+					<button id="sj-back" type="button" class="nav-btn" aria-label="Back" title="Back"><i data-lucide="arrow-left"></i></button>
+					<button id="sj-forward" type="button" class="nav-btn" aria-label="Forward" title="Forward"><i data-lucide="arrow-right"></i></button>
+					<button id="sj-reload" type="button" class="nav-btn" aria-label="Reload" title="Reload"><i data-lucide="rotate-cw"></i></button>
+				</div>
+
+				<select id="sj-search-engine" autocomplete="off">
+					<option value="https://duckduckgo.com/?q=%s">DuckDuckGo</option>
+					<option value="https://www.google.com/search?q=%s">Google</option>
+					<option value="https://en.wikipedia.org/wiki/Special:Search?search=%s">Wikipedia</option>
+				</select>
+
+				<input
+					id="sj-address"
+					type="text"
+					placeholder="Search or enter URL"
+					aria-label="Address bar"
+					autocomplete="off"
+					autocapitalize="off"
+					autocorrect="off"
+					spellcheck="false"
+				/>
+
+				<button id="sj-go" type="submit" class="go-btn" aria-label="Go" title="Go">
+					<i data-lucide="search"></i>
+				</button>
+			</form>
+		</header>
+
+		<main class="viewport">
+			<div id="sj-home" class="home-panel">
+
+				<img class="logo" src="sj.png" />
+				<h1>Allancoding Proxy</h1>
+
+				<!-- HOME SEARCH -->
+				<form id="sj-home-form" class="home-search" autocomplete="off">
+					<select id="sj-home-engine" autocomplete="off">
+						<option value="https://duckduckgo.com/?q=%s">DuckDuckGo</option>
+						<option value="https://www.google.com/search?q=%s">Google</option>
+						<option value="https://en.wikipedia.org/wiki/Special:Search?search=%s">Wikipedia</option>
+					</select>
+
+					<input
+						id="sj-home-address"
+						type="text"
+						placeholder="Search or enter URL"
+						aria-label="Home search"
+						autocomplete="off"
+						autocapitalize="off"
+						autocorrect="off"
+						spellcheck="false"
+					/>
+
+					<button type="submit" class="go-btn" aria-label="Search" title="Search">
+						<i data-lucide="search"></i>
+					</button>
+
+
+				</form>
+
+			</div>
+		</main>
+
+		<div class="status" id="sj-status">
 			<p id="sj-error"></p>
 			<pre id="sj-error-code"></pre>
 		</div>
-		<footer>
-			<div>
-				<a
-					title="The Mercury Workshop GitHub organization"
-					href="https://github.com/MercuryWorkshop"
-					>Mercury Workshop</a
-				>
-				<a
-					title="The example demo app for Scramjet"
-					href="https://github.com/MercuryWorkshop/Scramjet-Demo"
-					>GitHub</a
-				>
-				<a title="License information" href="credits.html">Credits</a>
-			</div>
-			<div>
-				<span>Scramjet &copy; MW 2025</span>
-			</div>
-		</footer>
-	</body>
+	</div>
+
+	<script>
+		lucide.createIcons();
+	</script>
+</body>
 </html>

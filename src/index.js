@@ -9,13 +9,16 @@ import { scramjetPath } from "@mercuryworkshop/scramjet/path";
 import { libcurlPath } from "@mercuryworkshop/libcurl-transport";
 import { baremuxPath } from "@mercuryworkshop/bare-mux/node";
 
+const controllerPath = fileURLToPath(
+	new URL("../node_modules/@mercuryworkshop/scramjet-controller/dist/", import.meta.url)
+);
+
 const publicPath = fileURLToPath(new URL("../public/", import.meta.url));
 
 // Wisp Configuration: Refer to the documentation at https://www.npmjs.com/package/@mercuryworkshop/wisp-js
 
 logging.set_level(logging.NONE);
 Object.assign(wisp.options, {
-	allow_udp_streams: false,
 	hostname_blacklist: [/example\.com/],
 	dns_servers: ["1.1.1.3", "1.0.0.3"],
 });
@@ -42,7 +45,13 @@ fastify.register(fastifyStatic, {
 
 fastify.register(fastifyStatic, {
 	root: scramjetPath,
-	prefix: "/scram/",
+	prefix: "/scramjet/",
+	decorateReply: false,
+});
+
+fastify.register(fastifyStatic, {
+	root: controllerPath,
+	prefix: "/controller/",
 	decorateReply: false,
 });
 
@@ -56,6 +65,26 @@ fastify.register(fastifyStatic, {
 	root: baremuxPath,
 	prefix: "/baremux/",
 	decorateReply: false,
+});
+
+fastify.get("/~/:target", (req, reply) => {
+	const encodedTarget = req.params?.target;
+	if (typeof encodedTarget !== "string" || encodedTarget.length === 0) {
+		return reply.redirect("/");
+	}
+
+	let decodedTarget = encodedTarget;
+	try {
+		decodedTarget = decodeURIComponent(encodedTarget);
+	} catch {
+		/* keep encoded target as-is */
+	}
+
+	if (!/^https?:\/\//i.test(decodedTarget)) {
+		decodedTarget = `https://${decodedTarget}`;
+	}
+
+	return reply.redirect(`/?goto=${encodeURIComponent(decodedTarget)}`, 302);
 });
 
 fastify.setNotFoundHandler((res, reply) => {
@@ -88,7 +117,7 @@ function shutdown() {
 
 let port = parseInt(process.env.PORT || "");
 
-if (isNaN(port)) port = 8080;
+if (isNaN(port)) port = 8787;
 
 fastify.listen({
 	port: port,

@@ -7,26 +7,19 @@
  */
 function search(input, template) {
 	try {
-		// input is a valid URL:
+		// input is an explicit URL with a scheme:
 		// eg: https://example.com, https://example.com/test?q=param
 		return new URL(input).toString();
 	} catch (err) {
-		// input was not a valid URL
+		// input was not a valid explicit URL
 	}
 
-	try {
-		// input is a valid URL when http:// is added to the start:
-		// eg: example.com, https://example.com/test?q=param
-		const url = new URL(`http://${input}`);
-		// only if the hostname has a TLD/subdomain
-		if (url.hostname.includes(".")) return url.toString();
-	} catch (err) {
-		// input was not valid URL
+	const bareHostPattern =
+		/^(localhost|(?:\d{1,3}\.){3}\d{1,3}|(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})(?::\d+)?(?:\/[^\s]*)?$/;
+	if (bareHostPattern.test(input)) {
+		return new URL(`https://${input}`).toString();
 	}
 
-	// input may have been a valid URL, however the hostname was invalid
-
-	// Attempts to convert the input to a fully qualified URL have failed
-	// Treat the input as a search query
+	// Treat ambiguous inputs as search queries instead of guessing a URL.
 	return template.replace("%s", encodeURIComponent(input));
 }
